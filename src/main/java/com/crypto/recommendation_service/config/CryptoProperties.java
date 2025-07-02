@@ -1,4 +1,4 @@
-package com.crypto.config;
+package com.crypto.recommendation_service.config;
 
 import lombok.Getter;
 import lombok.Setter;

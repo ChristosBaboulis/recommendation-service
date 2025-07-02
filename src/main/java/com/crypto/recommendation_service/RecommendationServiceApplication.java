@@ -1,6 +1,6 @@
-package com.crypto;
+package com.crypto.recommendation_service;
 
-import com.crypto.config.CryptoProperties;
+import com.crypto.recommendation_service.config.CryptoProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
