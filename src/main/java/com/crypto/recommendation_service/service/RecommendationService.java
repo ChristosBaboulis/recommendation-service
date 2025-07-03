@@ -40,7 +40,7 @@ public class RecommendationService {
             BigDecimal min = values.stream().map(CryptoEntry::getPrice).min(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
             BigDecimal max = values.stream().map(CryptoEntry::getPrice).max(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
 
-            statsList.add(new CryptoStats(null, symbol, oldest, newest, min, max));
+            statsList.add(new CryptoStats(symbol, oldest, newest, min, max));
         }
 
         return statsList;

@@ -73,7 +73,7 @@ class RecommendationServiceTest {
 
     @Test
     void getStatsForSymbol_shouldReturnMappedDto() {
-        CryptoStats stats = new CryptoStats(null, "BTC", BigDecimal.ONE, BigDecimal.TEN, BigDecimal.ONE, BigDecimal.TEN);
+        CryptoStats stats = new CryptoStats("BTC", BigDecimal.ONE, BigDecimal.TEN, BigDecimal.ONE, BigDecimal.TEN);
         CryptoStatsResponse response = new CryptoStatsResponse("BTC", BigDecimal.ONE, BigDecimal.TEN, BigDecimal.ONE, BigDecimal.TEN);
 
         when(entryService.getAllEntries()).thenReturn(List.of(

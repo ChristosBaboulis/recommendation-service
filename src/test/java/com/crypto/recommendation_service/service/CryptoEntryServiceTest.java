@@ -72,4 +72,16 @@ class CryptoEntryServiceTest {
         assertThat(result).hasSize(2);
         assertThat(result.getFirst().getSymbol()).isEqualTo("BTC");
     }
+
+    @Test
+    void saveAll_shouldSaveListOfEntries() {
+        List<CryptoEntry> entries = List.of(
+                new CryptoEntry(LocalDateTime.of(2022, 1, 1, 0, 0), "BTC", new BigDecimal("100")),
+                new CryptoEntry(LocalDateTime.of(2022, 1, 2, 0, 0), "ETH", new BigDecimal("200"))
+        );
+
+        service.saveAll(entries);
+
+        verify(repository).saveAll(entries);
+    }
 }

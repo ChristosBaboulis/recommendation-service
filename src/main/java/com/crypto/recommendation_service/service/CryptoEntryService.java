@@ -29,4 +29,8 @@ public class CryptoEntryService {
         LocalDateTime end = date.atTime(LocalTime.MAX);
         return repository.findAllByTimestampBetween(start, end);
     }
+
+    public void saveAll(List<CryptoEntry> entries) {
+        repository.saveAll(entries);
+    }
 }
