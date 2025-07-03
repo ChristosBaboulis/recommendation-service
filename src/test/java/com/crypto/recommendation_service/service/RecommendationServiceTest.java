@@ -45,7 +45,7 @@ class RecommendationServiceTest {
 
         when(entryService.getAllEntries()).thenReturn(List.of(e1, e2));
 
-        List<CryptoStats> result = service.calculateMonthlyStats();
+        List<CryptoStats> result = service.calculateStatsPerSymbol();
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().getSymbol()).isEqualTo("BTC");
@@ -91,9 +91,8 @@ class RecommendationServiceTest {
         assertThat(result.getNewestPrice()).isEqualByComparingTo("10");
     }
 
-
     @Test
-    void getCryptoWithHighestRangeOnDate_shouldReturnCorrectSymbol() {
+    void getCryptoWithHighestRangeOnDate_shouldReturnCorrectResult() {
         LocalDate date = LocalDate.now();
 
         when(entryService.getEntriesWithinDate(date)).thenReturn(List.of(
@@ -103,9 +102,10 @@ class RecommendationServiceTest {
                 new CryptoEntry(4L, date.atTime(23, 59), "ETH", new BigDecimal("120"))
         ));
 
-        String result = service.getCryptoWithHighestRangeOnDate(date);
+        NormalizedRangeResult result = service.getCryptoWithHighestRangeOnDate(date);
 
-        assertEquals("BTC", result);
+        assertEquals("BTC", result.getSymbol());
+        assertThat(result.getNormalizedRange()).isEqualByComparingTo("2.00000000");
     }
 
     @Test

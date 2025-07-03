@@ -23,7 +23,7 @@ public class RecommendationService {
     private final CryptoEntryService entryService;
     private final CryptoStatsMapper statsMapper;
 
-    public List<CryptoStats> calculateMonthlyStats() {
+    public List<CryptoStats> calculateStatsPerSymbol() {
         List<CryptoEntry> entries = entryService.getAllEntries();
 
         Map<String, List<CryptoEntry>> grouped = entries.stream()
@@ -49,7 +49,7 @@ public class RecommendationService {
     }
 
     public List<NormalizedRangeResult> getAllByNormalizedRangeDesc() {
-        List<CryptoStats> statsList = calculateMonthlyStats();
+        List<CryptoStats> statsList = calculateStatsPerSymbol();
 
         return statsList.stream()
                 .map(stats -> new NormalizedRangeResult(
@@ -61,7 +61,7 @@ public class RecommendationService {
     }
 
     public CryptoStatsResponse getStatsForSymbol(String symbol) {
-        CryptoStats stats = calculateMonthlyStats().stream()
+        CryptoStats stats = calculateStatsPerSymbol().stream()
                 .filter(s -> s.getSymbol().equalsIgnoreCase(symbol))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Unsupported or unknown symbol: " + symbol));
@@ -69,11 +69,7 @@ public class RecommendationService {
         return statsMapper.toDto(stats);
     }
 
-
-    public String getCryptoWithHighestRangeOnDate(LocalDate date) {
-        LocalDateTime start = date.atStartOfDay();
-        LocalDateTime end = date.atTime(LocalTime.MAX);
-
+    public NormalizedRangeResult getCryptoWithHighestRangeOnDate(LocalDate date) {
         List<CryptoEntry> entries = entryService.getEntriesWithinDate(date);
 
         return entries.stream()
@@ -84,10 +80,9 @@ public class RecommendationService {
                     BigDecimal min = entry.getValue().stream().map(CryptoEntry::getPrice).min(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
                     BigDecimal max = entry.getValue().stream().map(CryptoEntry::getPrice).max(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
                     BigDecimal normalized = max.subtract(min).divide(min, 8, RoundingMode.HALF_UP);
-                    return Map.entry(entry.getKey(), normalized);
+                    return new NormalizedRangeResult(entry.getKey(), normalized);
                 })
-                .max(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey)
+                .max(Comparator.comparing(NormalizedRangeResult::getNormalizedRange))
                 .orElseThrow(() -> new IllegalArgumentException("No crypto data found for date: " + date));
     }
 
