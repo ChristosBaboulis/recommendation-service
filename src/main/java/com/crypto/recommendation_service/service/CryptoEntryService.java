@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -32,5 +33,9 @@ public class CryptoEntryService {
 
     public void saveAll(List<CryptoEntry> entries) {
         repository.saveAll(entries);
+    }
+
+    public Stream<CryptoEntry> streamEntriesBySymbol(String symbol) {
+        return repository.streamBySymbol(symbol);
     }
 }

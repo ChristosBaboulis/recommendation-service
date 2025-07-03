@@ -13,6 +13,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -22,25 +23,24 @@ public class RecommendationService {
     private final CryptoStatsMapper statsMapper;
 
     public List<CryptoStats> calculateStatsPerSymbol() {
-        List<CryptoEntry> entries = entryService.getAllEntries();
-
-        Map<String, List<CryptoEntry>> grouped = entries.stream()
-                .collect(Collectors.groupingBy(CryptoEntry::getSymbol));
+        List<String> supportedSymbols = List.of("BTC", "ETH", "LTC", "DOGE", "XRP"); // ή dynamic in future
 
         List<CryptoStats> statsList = new ArrayList<>();
 
-        for (Map.Entry<String, List<CryptoEntry>> entry : grouped.entrySet()) {
-            String symbol = entry.getKey();
-            List<CryptoEntry> values = entry.getValue();
+        for (String symbol : supportedSymbols) {
+            try (Stream<CryptoEntry> stream = entryService.streamEntriesBySymbol(symbol)) {
+                List<CryptoEntry> entries = stream.sorted(Comparator.comparing(CryptoEntry::getTimestamp))
+                        .toList();
 
-            values.sort(Comparator.comparing(CryptoEntry::getTimestamp));
+                if (entries.isEmpty()) continue;
 
-            BigDecimal oldest = values.getFirst().getPrice();
-            BigDecimal newest = values.getLast().getPrice();
-            BigDecimal min = values.stream().map(CryptoEntry::getPrice).min(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
-            BigDecimal max = values.stream().map(CryptoEntry::getPrice).max(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
+                BigDecimal oldest = entries.getFirst().getPrice();
+                BigDecimal newest = entries.getLast().getPrice();
+                BigDecimal min = entries.stream().map(CryptoEntry::getPrice).min(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
+                BigDecimal max = entries.stream().map(CryptoEntry::getPrice).max(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
 
-            statsList.add(new CryptoStats(symbol, oldest, newest, min, max));
+                statsList.add(new CryptoStats(symbol, oldest, newest, min, max));
+            }
         }
 
         return statsList;

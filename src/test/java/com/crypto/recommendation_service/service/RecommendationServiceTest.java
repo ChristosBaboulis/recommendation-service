@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,31 +39,40 @@ class RecommendationServiceTest {
     }
 
     @Test
-    void calculateMonthlyStats_shouldReturnCorrectStats() {
+    void calculateStatsPerSymbol_shouldReturnCorrectStats() {
         LocalDateTime now = LocalDateTime.now();
         CryptoEntry e1 = new CryptoEntry(1L, now.minusDays(2), "BTC", new BigDecimal("50"));
         CryptoEntry e2 = new CryptoEntry(2L, now, "BTC", new BigDecimal("150"));
 
-        when(entryService.getAllEntries()).thenReturn(List.of(e1, e2));
+        when(entryService.streamEntriesBySymbol("BTC")).thenReturn(Stream.of(e1, e2));
+        when(entryService.streamEntriesBySymbol("ETH")).thenReturn(Stream.empty());
+        when(entryService.streamEntriesBySymbol("LTC")).thenReturn(Stream.empty());
+        when(entryService.streamEntriesBySymbol("DOGE")).thenReturn(Stream.empty());
+        when(entryService.streamEntriesBySymbol("XRP")).thenReturn(Stream.empty());
 
         List<CryptoStats> result = service.calculateStatsPerSymbol();
 
         assertThat(result).hasSize(1);
-        assertThat(result.getFirst().getSymbol()).isEqualTo("BTC");
-        assertThat(result.getFirst().getMinPrice()).isEqualByComparingTo("50");
-        assertThat(result.getFirst().getMaxPrice()).isEqualByComparingTo("150");
-        assertThat(result.getFirst().getOldestPrice()).isEqualByComparingTo("50");
-        assertThat(result.getFirst().getNewestPrice()).isEqualByComparingTo("150");
+        CryptoStats stats = result.get(0);
+        assertThat(stats.getSymbol()).isEqualTo("BTC");
+        assertThat(stats.getMinPrice()).isEqualByComparingTo("50");
+        assertThat(stats.getMaxPrice()).isEqualByComparingTo("150");
+        assertThat(stats.getOldestPrice()).isEqualByComparingTo("50");
+        assertThat(stats.getNewestPrice()).isEqualByComparingTo("150");
     }
 
     @Test
     void getAllByNormalizedRangeDesc_shouldReturnSortedResults() {
-        when(entryService.getAllEntries()).thenReturn(List.of(
-                new CryptoEntry(1L, LocalDateTime.now(), "BTC", new BigDecimal("50")),
-                new CryptoEntry(2L, LocalDateTime.now(), "BTC", new BigDecimal("200")),
-                new CryptoEntry(3L, LocalDateTime.now(), "ETH", new BigDecimal("100")),
-                new CryptoEntry(4L, LocalDateTime.now(), "ETH", new BigDecimal("200"))
-        ));
+        CryptoEntry b1 = new CryptoEntry(1L, LocalDateTime.now(), "BTC", new BigDecimal("50"));
+        CryptoEntry b2 = new CryptoEntry(2L, LocalDateTime.now(), "BTC", new BigDecimal("200"));
+        CryptoEntry e1 = new CryptoEntry(3L, LocalDateTime.now(), "ETH", new BigDecimal("100"));
+        CryptoEntry e2 = new CryptoEntry(4L, LocalDateTime.now(), "ETH", new BigDecimal("200"));
+
+        when(entryService.streamEntriesBySymbol("BTC")).thenReturn(Stream.of(b1, b2));
+        when(entryService.streamEntriesBySymbol("ETH")).thenReturn(Stream.of(e1, e2));
+        when(entryService.streamEntriesBySymbol("LTC")).thenReturn(Stream.empty());
+        when(entryService.streamEntriesBySymbol("DOGE")).thenReturn(Stream.empty());
+        when(entryService.streamEntriesBySymbol("XRP")).thenReturn(Stream.empty());
 
         List<NormalizedRangeResult> result = service.getAllByNormalizedRangeDesc();
 
@@ -73,13 +83,16 @@ class RecommendationServiceTest {
 
     @Test
     void getStatsForSymbol_shouldReturnMappedDto() {
+        CryptoEntry e1 = new CryptoEntry(1L, LocalDateTime.now().minusDays(1), "BTC", BigDecimal.ONE);
+        CryptoEntry e2 = new CryptoEntry(2L, LocalDateTime.now(), "BTC", BigDecimal.TEN);
         CryptoStats stats = new CryptoStats("BTC", BigDecimal.ONE, BigDecimal.TEN, BigDecimal.ONE, BigDecimal.TEN);
         CryptoStatsResponse response = new CryptoStatsResponse("BTC", BigDecimal.ONE, BigDecimal.TEN, BigDecimal.ONE, BigDecimal.TEN);
 
-        when(entryService.getAllEntries()).thenReturn(List.of(
-                new CryptoEntry(1L, LocalDateTime.now().minusDays(1), "BTC", BigDecimal.ONE),
-                new CryptoEntry(2L, LocalDateTime.now(), "BTC", BigDecimal.TEN)
-        ));
+        when(entryService.streamEntriesBySymbol("BTC")).thenReturn(Stream.of(e1, e2));
+        when(entryService.streamEntriesBySymbol("ETH")).thenReturn(Stream.empty());
+        when(entryService.streamEntriesBySymbol("LTC")).thenReturn(Stream.empty());
+        when(entryService.streamEntriesBySymbol("DOGE")).thenReturn(Stream.empty());
+        when(entryService.streamEntriesBySymbol("XRP")).thenReturn(Stream.empty());
         when(mapper.toDto(stats)).thenReturn(response);
 
         CryptoStatsResponse result = service.getStatsForSymbol("BTC");
@@ -110,7 +123,11 @@ class RecommendationServiceTest {
 
     @Test
     void getStatsForSymbol_shouldThrowWhenSymbolNotFound() {
-        when(entryService.getAllEntries()).thenReturn(List.of());
+        when(entryService.streamEntriesBySymbol("BTC")).thenReturn(Stream.empty());
+        when(entryService.streamEntriesBySymbol("ETH")).thenReturn(Stream.empty());
+        when(entryService.streamEntriesBySymbol("LTC")).thenReturn(Stream.empty());
+        when(entryService.streamEntriesBySymbol("DOGE")).thenReturn(Stream.empty());
+        when(entryService.streamEntriesBySymbol("XRP")).thenReturn(Stream.empty());
 
         assertThrows(IllegalArgumentException.class, () -> service.getStatsForSymbol("XYZ"));
     }
