@@ -75,4 +75,4 @@ Each CSV file should be named like `BTC_values.csv`, `ETH_values.csv`, etc.
 
 ---
 
-For detailed API specifications and example request/response bodies, see: [api-details.md](api-details.md)
+For detailed API specifications and example request/response bodies, see: [docs/api-details.md](docs/api-details.md)
