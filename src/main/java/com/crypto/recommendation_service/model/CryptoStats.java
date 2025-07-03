@@ -33,7 +33,6 @@ public class CryptoStats {
     @Column(name = "max_price", nullable = false, precision = 19, scale = 8)
     private BigDecimal maxPrice;
 
-    // Constructor χωρίς id για ευκολία στη δημιουργία αντικειμένων πριν το persistence
     public CryptoStats(String symbol, BigDecimal oldestPrice, BigDecimal newestPrice, BigDecimal minPrice, BigDecimal maxPrice) {
         this.symbol = symbol;
         this.oldestPrice = oldestPrice;
