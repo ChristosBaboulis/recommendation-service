@@ -5,6 +5,9 @@ import com.crypto.recommendation_service.repository.CryptoEntryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -19,5 +22,11 @@ public class CryptoEntryService {
 
     public CryptoEntry saveEntry(CryptoEntry entry) {
         return repository.save(entry);
+    }
+
+    public List<CryptoEntry> getEntriesWithinDate(LocalDate date) {
+        LocalDateTime start = date.atStartOfDay();
+        LocalDateTime end = date.atTime(LocalTime.MAX);
+        return repository.findAllByTimestampBetween(start, end);
     }
 }

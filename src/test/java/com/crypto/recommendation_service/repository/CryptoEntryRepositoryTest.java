@@ -35,4 +35,22 @@ class CryptoEntryRepositoryTest {
         assertThat(saved.getPrice()).isEqualByComparingTo("46813.21");
         assertThat(saved.getTimestamp()).isEqualTo(LocalDateTime.of(2022, 1, 1, 0, 0));
     }
+
+    @Test
+    @DisplayName("Should return entries between two timestamps")
+    void findAllByTimestampBetween_shouldReturnCorrectEntries() {
+        CryptoEntry entry1 = new CryptoEntry(LocalDateTime.of(2022, 1, 1, 10, 0), "BTC", new BigDecimal("40000"));
+        CryptoEntry entry2 = new CryptoEntry(LocalDateTime.of(2022, 1, 2, 10, 0), "BTC", new BigDecimal("42000"));
+        CryptoEntry entry3 = new CryptoEntry(LocalDateTime.of(2022, 1, 3, 10, 0), "BTC", new BigDecimal("43000"));
+
+        repository.saveAll(List.of(entry1, entry2, entry3));
+
+        LocalDateTime from = LocalDateTime.of(2022, 1, 2, 0, 0);
+        LocalDateTime to = LocalDateTime.of(2022, 1, 3, 0, 0);
+
+        List<CryptoEntry> results = repository.findAllByTimestampBetween(from, to);
+
+        assertThat(results).hasSize(1);
+        assertThat(results.getFirst().getPrice()).isEqualByComparingTo("42000");
+    }
 }
