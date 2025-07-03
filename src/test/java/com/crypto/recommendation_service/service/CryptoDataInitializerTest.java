@@ -21,21 +21,13 @@ class CryptoDataInitializerTest {
     void setUp() {
         csvLoader = mock(CryptoCSVLoader.class);
         entryService = mock(CryptoEntryService.class);
-        initializer = new CryptoDataInitializer(csvLoader, entryService);
+        initializer = new CryptoDataInitializer(csvLoader);
     }
 
     @Test
-    void init_shouldLoadCsvAndSaveToDatabase() {
-        List<CryptoEntry> btcList = List.of(
-                new CryptoEntry(LocalDateTime.now(), "BTC", new BigDecimal("100"))
-        );
-        Map<String, List<CryptoEntry>> mockData = Map.of("BTC", btcList);
-
-        when(csvLoader.loadAll()).thenReturn(mockData);
-
+    void init_shouldTriggerCsvParsingAndSave() {
+        doNothing().when(csvLoader).loadAndSaveAll();
         initializer.init();
-
-        verify(csvLoader).loadAll();
-        verify(entryService).saveAll(btcList);
+        verify(csvLoader).loadAndSaveAll();
     }
 }

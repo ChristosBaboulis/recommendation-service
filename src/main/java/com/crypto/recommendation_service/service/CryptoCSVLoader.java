@@ -25,60 +25,50 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class CryptoCSVLoader {
-    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final int BATCH_SIZE = 1000;
     private final CryptoProperties cryptoProperties;
+    private final CryptoEntryService entryService;
 
-    public Map<String, List<CryptoEntry>> loadAll(){
-        Map<String, List<CryptoEntry>> dataMap = new HashMap<>();
+    public void loadAndSaveAll() {
+        List<String> symbols = List.of("BTC", "ETH", "LTC", "DOGE", "XRP");
+        String folderPath = cryptoProperties.getCsvFolder();
 
-        try{
-            List<String> symbols = List.of("BTC", "ETH", "LTC", "DOGE", "XRP");
-            String folderPath = cryptoProperties.getCsvFolder();
-
-            for(String symbol : symbols){
-                List<CryptoEntry> cryptoEntries = loadForSymbol(symbol);
-                dataMap.put(symbol, cryptoEntries);
-                log.info("Loaded {} records for {}", cryptoEntries.size(), symbol);
-            }
-        } catch (Exception e){
-            log.error("Error loading CSV files", e);
+        for (String symbol : symbols) {
+            Path csvPath = Path.of(folderPath, symbol + "_values.csv");
+            parseAndSaveBatches(csvPath.toString(), symbol);
         }
-
-        return dataMap;
     }
 
-    private List<CryptoEntry> loadForSymbol(String symbol) {
-        Path csvPath = Path.of(cryptoProperties.getCsvFolder(), symbol + "_values.csv");
-        return parseCsv(csvPath.toString());
-    }
-
-    private List<CryptoEntry> parseCsv(String filePath) {
-        List<CryptoEntry> cryptoEntries = new ArrayList<>();
-
+    private void parseAndSaveBatches(String filePath, String symbol) {
         try (FileReader fileReader = new FileReader(filePath)) {
-            CSVFormat format = CSVFormat.Builder.create(CSVFormat.DEFAULT)
-                    .setHeader()
-                    .setSkipHeaderRecord(true)
-                    .build();
+            CSVParser parser = CSVFormat.DEFAULT
+                    .withHeader()
+                    .withSkipHeaderRecord(true)
+                    .parse(fileReader);
 
-            CSVParser parser = format.parse(fileReader);
+            List<CryptoEntry> batch = new ArrayList<>();
 
             for (CSVRecord record : parser) {
                 long epochMillis = Long.parseLong(record.get("timestamp"));
-                LocalDateTime timestamp = LocalDateTime.ofInstant(
-                        Instant.ofEpochMilli(epochMillis), ZoneId.systemDefault());
-
-                String symbol = record.get("symbol");
-
+                LocalDateTime timestamp = LocalDateTime.ofInstant(Instant.ofEpochMilli(epochMillis), ZoneId.systemDefault());
                 BigDecimal price = new BigDecimal(record.get("price"));
 
-                cryptoEntries.add(new CryptoEntry(timestamp, symbol, price));
+                batch.add(new CryptoEntry(timestamp, symbol, price));
+
+                if (batch.size() == BATCH_SIZE) {
+                    entryService.saveAll(batch);
+                    log.info("Saved batch of {} for {}", batch.size(), symbol);
+                    batch.clear();
+                }
+            }
+
+            if (!batch.isEmpty()) {
+                entryService.saveAll(batch);
+                log.info("Saved final batch of {} for {}", batch.size(), symbol);
             }
 
         } catch (Exception e) {
             log.error("Failed to parse CSV: {}", filePath, e);
         }
-
-        return cryptoEntries;
     }
 }
