@@ -14,8 +14,9 @@ It loads CSV data into the H2 database using `CryptoCSVLoader` and persists it v
 ---
 
 ### `service/CryptoCSVLoader`
-Exposes the method `loadAll()` which reads all 5 CSV files located in the configured folder.  
-The folder path is provided through `CryptoProperties` (`application.yml`).
+Exposes the method `loadAndSaveAll()` which reads all 5 CSV files located in the configured folder.  
+Each file is processed in **fixed-size batches** (e.g., 1000 entries per batch) to avoid loading all data in memory.  
+Batches are persisted to H2 via `CryptoEntryService`.
 
 ---
 
@@ -55,9 +56,9 @@ Returns `400 Bad Request` with the error message as plain text in the response b
 ```plaintext
 On Startup:
 ├── CryptoDataInitializer
-    └── CryptoCSVLoader.loadAll()
+    └── CryptoCSVLoader.loadAndSaveAll()
         └── Parses 5 CSVs from /data
-            └── Saves entries to H2 via CryptoEntryService
+            └── Saves entries in batches (e.g., 1000 rows per batch) to H2 via CryptoEntryService
 ```
 
 ---
@@ -79,9 +80,15 @@ Each record contains:
 
 ---
 
+## Streaming Logic (Read Optimization)
+
+- Crypto statistics are calculated per symbol using **JPA streaming** (e.g., via `Stream<CryptoEntry>`), which avoids loading all entries in memory.
+- This enables the application to scale to very large datasets (e.g., per-second data over a year) without `OutOfMemoryError`.
+- The batching strategy during CSV ingestion and the streaming read logic together ensure memory-efficient processing.
+
+---
+
 ## Recommendation
 
 To extend:
 - Move from fixed list of 5 symbols to dynamic discovery (e.g., file listing or DB config).
-- Allow time-range parameterization for different recommendation needs (e.g., 1-month vs 6-month).
-- Add caching or pagination if dataset grows large.

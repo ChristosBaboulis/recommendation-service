@@ -49,7 +49,8 @@ This is a Spring Boot application that provides statistics and investment recomm
 
 ## CSV Input
 
-The application loads historical data from CSV files located under the `./data` directory. The folder path is configured in `application.yml` under:
+Upon application startup, historical data is automatically loaded from CSV files located under the ./data directory using batch processing to ensure memory efficiency.
+The folder path is configured in application.yml under:
 
 ```yaml
 crypto:
@@ -61,9 +62,12 @@ Each CSV file should be named like `BTC_values.csv`, `ETH_values.csv`, etc.
 ## Design Considerations
 
 - The application is designed to be **easily extensible**: to add a new crypto, simply add its CSV file and symbol.
-- All recommendations are computed **in-memory**, based on the CSV-loaded data, and not persisted to the database.
+- All CSV records are persisted to the database at startup using batched inserts (1000 records per batch), enabling efficient processing even for large datasets.
+  Recommendations are computed on-demand from the persisted data.
 - The application **guards against unsupported symbols** by validating them before computing statistics.
 - Although current logic focuses on 1-month data, it is **scalable to longer timeframes** like 6 months or 1 year with minimal changes to the grouping logic.
+- Stream-based processing and batching ensure the application can scale to handle millions of records without exhausting memory.
+- For large datasets (e.g., a full year of per-second crypto prices), the service processes data using JPA Stream, avoiding memory overload.
 
 ## Extra Mile (Optional Features)
 
