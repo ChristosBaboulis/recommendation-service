@@ -38,4 +38,8 @@ public class CryptoEntryService {
     public Stream<CryptoEntry> streamEntriesBySymbol(String symbol) {
         return repository.streamBySymbol(symbol);
     }
+
+    public List<String> getAllSymbols() {
+        return repository.findDistinctSymbols();
+    }
 }

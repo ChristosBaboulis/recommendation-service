@@ -9,6 +9,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
+import java.io.File;
 import java.io.FileReader;
 import java.math.BigDecimal;
 import java.nio.file.Path;
@@ -30,12 +31,16 @@ public class CryptoCSVLoader {
     private final CryptoEntryService entryService;
 
     public void loadAndSaveAll() {
-        List<String> symbols = List.of("BTC", "ETH", "LTC", "DOGE", "XRP");
-        String folderPath = cryptoProperties.getCsvFolder();
+        File folder = new File(cryptoProperties.getCsvFolder());
+        File[] files = folder.listFiles((dir, name) -> name.endsWith("_values.csv"));
 
-        for (String symbol : symbols) {
-            Path csvPath = Path.of(folderPath, symbol + "_values.csv");
-            parseAndSaveBatches(csvPath.toString(), symbol);
+        if (files != null) {
+            for (File file : files) {
+                String filename = file.getName(); // π.χ. BTC_values.csv
+                String symbol = filename.replace("_values.csv", "");
+                Path csvPath = file.toPath();
+                parseAndSaveBatches(csvPath.toString(), symbol);
+            }
         }
     }
 

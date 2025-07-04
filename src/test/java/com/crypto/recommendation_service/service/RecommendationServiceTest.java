@@ -49,11 +49,13 @@ class RecommendationServiceTest {
         when(entryService.streamEntriesBySymbol("LTC")).thenReturn(Stream.empty());
         when(entryService.streamEntriesBySymbol("DOGE")).thenReturn(Stream.empty());
         when(entryService.streamEntriesBySymbol("XRP")).thenReturn(Stream.empty());
+        when(entryService.getAllSymbols()).thenReturn(List.of("BTC"));
+
 
         List<CryptoStats> result = service.calculateStatsPerSymbol();
 
         assertThat(result).hasSize(1);
-        CryptoStats stats = result.get(0);
+        CryptoStats stats = result.getFirst();
         assertThat(stats.getSymbol()).isEqualTo("BTC");
         assertThat(stats.getMinPrice()).isEqualByComparingTo("50");
         assertThat(stats.getMaxPrice()).isEqualByComparingTo("150");
@@ -73,6 +75,7 @@ class RecommendationServiceTest {
         when(entryService.streamEntriesBySymbol("LTC")).thenReturn(Stream.empty());
         when(entryService.streamEntriesBySymbol("DOGE")).thenReturn(Stream.empty());
         when(entryService.streamEntriesBySymbol("XRP")).thenReturn(Stream.empty());
+        when(entryService.getAllSymbols()).thenReturn(List.of("BTC", "ETH"));
 
         List<NormalizedRangeResult> result = service.getAllByNormalizedRangeDesc();
 
@@ -93,6 +96,8 @@ class RecommendationServiceTest {
         when(entryService.streamEntriesBySymbol("LTC")).thenReturn(Stream.empty());
         when(entryService.streamEntriesBySymbol("DOGE")).thenReturn(Stream.empty());
         when(entryService.streamEntriesBySymbol("XRP")).thenReturn(Stream.empty());
+        when(entryService.getAllSymbols()).thenReturn(List.of("BTC", "ETH"));
+
         when(mapper.toDto(stats)).thenReturn(response);
 
         CryptoStatsResponse result = service.getStatsForSymbol("BTC");

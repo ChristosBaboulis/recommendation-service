@@ -57,15 +57,20 @@ crypto:
   csv-folder: ./data
 ```
 
-Each CSV file should be named like `BTC_values.csv`, `ETH_values.csv`, etc.
+Each CSV file **must follow the format**: `<SYMBOL>_values.csv`, e.g., `BTC_values.csv`.
+
+Additionally, all rows **must contain records with matching `symbol` values** inside the CSV.  
+For example, in `BTC_values.csv`, every row's `symbol` column must be `"BTC"`.
+
+This convention ensures correct parsing and categorization of cryptocurrency entries.
 
 ## Design Considerations
 
 - The application is designed to be **easily extensible**: to add a new crypto, simply add its CSV file and symbol.
+- The service dynamically discovers supported cryptocurrencies at runtime by scanning the configured CSV directory for files ending in `_values.csv`. This removes the need for hardcoded symbol lists. Adding a new cryptocurrency is as simple as dropping a properly named file (e.g., `ADA_values.csv`) into the data folder. The system will automatically ingest and include it in all calculations.
 - All CSV records are persisted to the database at startup using batched inserts (1000 records per batch), enabling efficient processing even for large datasets.
   Recommendations are computed on-demand from the persisted data.
 - The application **guards against unsupported symbols** by validating them before computing statistics.
-- Although current logic focuses on 1-month data, it is **scalable to longer timeframes** like 6 months or 1 year with minimal changes to the grouping logic.
 - Stream-based processing and batching ensure the application can scale to handle millions of records without exhausting memory.
 - For large datasets (e.g., a full year of per-second crypto prices), the service processes data using JPA Stream, avoiding memory overload.
 
@@ -79,4 +84,5 @@ Each CSV file should be named like `BTC_values.csv`, `ETH_values.csv`, etc.
 
 ---
 
-For detailed API specifications and example request/response bodies, see: [docs/api-details.md](docs/api-details.md)
+For detailed project structure, see: [docs/api-details.md](docs/api-details.md)  
+For detailed Endpoints specifications and example request/response bodies, see: [docs/api-endpoints-specifications.md](docs/api-endpoints-specifications.md)

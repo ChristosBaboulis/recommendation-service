@@ -16,6 +16,8 @@ It loads CSV data into the H2 database using `CryptoCSVLoader` and persists it v
 ### `service/CryptoCSVLoader`
 Exposes the method `loadAndSaveAll()` which reads all 5 CSV files located in the configured folder.  
 Each file is processed in **fixed-size batches** (e.g., 1000 entries per batch) to avoid loading all data in memory.  
+Data loading is performed in **fixed-size batches (e.g., 1000 records)** for memory efficiency.  
+Supported symbols are discovered **dynamically** by scanning the CSV directory for files ending in `_values.csv`.  
 Batches are persisted to H2 via `CryptoEntryService`.
 
 ---
@@ -75,8 +77,6 @@ Each record contains:
 ## Notes
 
 - CSV ingestion is done once at application startup.
-- Only 5 cryptocurrencies are supported by default (`BTC`, `ETH`, `LTC`, `DOGE`, `XRP`).
-- The service is designed to scale with additional symbols if needed in future.
 
 ---
 
@@ -87,8 +87,3 @@ Each record contains:
 - The batching strategy during CSV ingestion and the streaming read logic together ensure memory-efficient processing.
 
 ---
-
-## Recommendation
-
-To extend:
-- Move from fixed list of 5 symbols to dynamic discovery (e.g., file listing or DB config).

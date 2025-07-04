@@ -23,7 +23,7 @@ public class RecommendationService {
     private final CryptoStatsMapper statsMapper;
 
     public List<CryptoStats> calculateStatsPerSymbol() {
-        List<String> supportedSymbols = List.of("BTC", "ETH", "LTC", "DOGE", "XRP"); // ή dynamic in future
+        List<String> supportedSymbols = entryService.getAllSymbols();
 
         List<CryptoStats> statsList = new ArrayList<>();
 

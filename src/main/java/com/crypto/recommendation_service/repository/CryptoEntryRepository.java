@@ -16,4 +16,7 @@ public interface CryptoEntryRepository extends JpaRepository<CryptoEntry, Long> 
 
     @Query("SELECT e FROM CryptoEntry e WHERE e.symbol = :symbol ORDER BY e.timestamp ASC")
     Stream<CryptoEntry> streamBySymbol(@Param("symbol") String symbol);
+
+    @Query("SELECT DISTINCT c.symbol FROM CryptoEntry c")
+    List<String> findDistinctSymbols();
 }
