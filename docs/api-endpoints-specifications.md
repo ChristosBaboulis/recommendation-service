@@ -56,7 +56,7 @@ GET http://localhost:8080/cryptos/BTC/stats
 ```
 
 **Error Example (unknown symbol):**  
-```json
+```
 Status: 400 Bad Request
 Body: "Unsupported or unknown symbol: XYZ"
 ```
@@ -84,7 +84,7 @@ GET http://localhost:8080/cryptos/highest-range?date=2022-01-05
 ```
 
 **Error Example (no data for date):**  
-```json
+```
 Status: 400 Bad Request
 Body: "No crypto data found for date: 2022-01-01"
 ```
