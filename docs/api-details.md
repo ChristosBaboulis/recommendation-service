@@ -74,16 +74,16 @@ Each record contains:
 
 ---
 
-## Notes
-
-- CSV ingestion is done once at application startup.
-
----
-
 ## Streaming Logic (Read Optimization)
 
 - Crypto statistics are calculated per symbol using **JPA streaming** (e.g., via `Stream<CryptoEntry>`), which avoids loading all entries in memory.
 - This enables the application to scale to very large datasets (e.g., per-second data over a year) without `OutOfMemoryError`.
 - The batching strategy during CSV ingestion and the streaming read logic together ensure memory-efficient processing.
+
+---
+
+## Notes
+
+- CSV ingestion is done once at application startup.
 
 ---
