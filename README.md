@@ -17,6 +17,7 @@ This is a Spring Boot application that provides statistics and investment recomm
 - **JUnit 5** (unit and integration testing)
 - **GitHub Actions** (CI pipeline)
 - **Java Stream API** (for data processing and transformation)
+- **Bucket4j** (rate limiting based on client IP to mitigate abuse from malicious users)
 
 
 ---
@@ -124,6 +125,7 @@ This convention ensures correct parsing and categorization of cryptocurrency ent
 - The application **guards against unsupported symbols** by validating them before computing statistics.
 - Stream-based processing and batching ensure the application can scale to handle millions of records without exhausting memory.
 - For large datasets (e.g., a full year of per-second crypto prices), the service processes data using JPA Stream, avoiding memory overload.
+- To protect against abuse and ensure fair usage, the application includes a custom rate limiting filter using Bucket4j, which restricts clients to a maximum of 10 requests per minute based on their IP address. This mechanism directly addresses the need to mitigate malicious behavior and excessive API usage.
 
 ---
 
@@ -133,7 +135,7 @@ This convention ensures correct parsing and categorization of cryptocurrency ent
   The application is Dockerized using a standard `Dockerfile`, preparing it for deployment in Kubernetes environments.
 
 - **Rate Limiting (per IP)**  
-  To protect from malicious usage, a rate limiter such as Bucket4j or Spring Cloud Gateway can be added for IP throttling.
+  To protect from malicious usage, Bucket4j rate limiter is used for IP throttling. (max 10 requests per minute)
 
 ---
 

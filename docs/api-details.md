@@ -37,6 +37,13 @@ Declares a manual CryptoStatsMapper bean for mapping internal model objects to D
 
 ---
 
+### `config/RateLimitingFilter`
+A custom filter that enforces IP-based rate limiting using [Bucket4j](https://github.com/bucket4j/bucket4j).  
+The filter is configured to allow **10 requests per minute per IP address**. This helps mitigate abuse and fulfills the requirement:  
+*"Malicious users will always exist, so it will be really beneficial if at least we can rate limit them (based on IP)."*
+
+---
+
 ### `exception/GlobalExceptionHandler`
 Handles runtime exceptions for REST controllers (currently only `IllegalArgumentException`).  
 Returns `400 Bad Request` with the error message as plain text in the response body.
@@ -53,8 +60,8 @@ Returns `400 Bad Request` with the error message as plain text in the response b
 | **DTO**                           | `CryptoStatsMapper`, `CryptoStatsResponse`, `NormalizedRangeResult` |
 | **Controller**                    | `RecommendationController`                                          |
 | **Exception**                     | `GlobalExceptionHandler`                                            |
-| **Service** (Init Purpose)        | `CryptoDataInitializer`, `CryptoCSVLoader`                                  |
-| **Config**                        | `CryptoProperties`, `MapperConfig`                                  |
+| **Service** (Init Purpose)        | `CryptoDataInitializer`, `CryptoCSVLoader`                          |
+| **Config**                        | `CryptoProperties`, `MapperConfig`, `RateLimitingFilter`            |
 ---
 
 ## Application Flow
