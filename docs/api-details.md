@@ -14,9 +14,8 @@ It loads CSV data into the H2 database using `CryptoCSVLoader` and persists it v
 ---
 
 ### `service/CryptoCSVLoader`
-Exposes the method `loadAndSaveAll()` which reads all 5 CSV files located in the configured folder.  
+Exposes the method `loadAndSaveAll()` which reads all CSV files located in the configured folder.  
 Each file is processed in **fixed-size batches** (e.g., 1000 entries per batch) to avoid loading all data in memory.  
-Data loading is performed in **fixed-size batches (e.g., 1000 records)** for memory efficiency.  
 Supported symbols are discovered **dynamically** by scanning the CSV directory for files ending in `_values.csv`.  
 Batches are persisted to H2 via `CryptoEntryService`.
 
@@ -33,6 +32,11 @@ crypto:
 
 ---
 
+### `config/MapperConfig`
+Declares a manual CryptoStatsMapper bean for mapping internal model objects to DTOs
+
+---
+
 ### `exception/GlobalExceptionHandler`
 Handles runtime exceptions for REST controllers (currently only `IllegalArgumentException`).  
 Returns `400 Bad Request` with the error message as plain text in the response body.
@@ -41,16 +45,16 @@ Returns `400 Bad Request` with the error message as plain text in the response b
 
 ## Code Structure
 
-| Layer                     | Classes                                                                 |
-|---------------------------|-------------------------------------------------------------------------|
-| **Model**                 | `CryptoEntry`, `CryptoStats`                                            |
-| **Repository**            | `CryptoEntryRepository`                                                 |
-| **Service**               | `CryptoEntryService`, `RecommendationService`                           |
-| **DTO**                   | `CryptoStatsMapper`, `CryptoStatsResponse`, `NormalizedRangeResult`     |
-| **Controller**            | `RecommendationController`                                              |
-| **Exception**             | `GlobalExceptionHandler`                                                |
-| **Service(Init Purpose)** | `CryptoDataInitializer`, `CryptoCSVLoader`, `CryptoProperties`          |
-
+| Layer                             | Classes                                                             |
+|-----------------------------------|---------------------------------------------------------------------|
+| **Model**                         | `CryptoEntry`, `CryptoStats`                                        |
+| **Repository**                    | `CryptoEntryRepository`                                             |
+| **Service** (DML, Business Logic) | `CryptoEntryService`, `RecommendationService`                       |
+| **DTO**                           | `CryptoStatsMapper`, `CryptoStatsResponse`, `NormalizedRangeResult` |
+| **Controller**                    | `RecommendationController`                                          |
+| **Exception**                     | `GlobalExceptionHandler`                                            |
+| **Service** (Init Purpose)        | `CryptoDataInitializer`, `CryptoCSVLoader`                                  |
+| **Config**                        | `CryptoProperties`, `MapperConfig`                                  |
 ---
 
 ## Application Flow
@@ -59,7 +63,7 @@ Returns `400 Bad Request` with the error message as plain text in the response b
 On Startup:
 ├── CryptoDataInitializer
     └── CryptoCSVLoader.loadAndSaveAll()
-        └── Parses 5 CSVs from /data
+        └── Parses CSVs from /data
             └── Saves entries in batches (e.g., 1000 rows per batch) to H2 via CryptoEntryService
 ```
 
