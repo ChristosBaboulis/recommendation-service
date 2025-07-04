@@ -8,6 +8,7 @@ import com.crypto.recommendation_service.dto.CryptoStatsMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -46,6 +47,7 @@ public class RecommendationService {
         return statsList;
     }
 
+    @Transactional(readOnly = true)
     public List<NormalizedRangeResult> getAllByNormalizedRangeDesc() {
         List<CryptoStats> statsList = calculateStatsPerSymbol();
 
@@ -58,6 +60,7 @@ public class RecommendationService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public CryptoStatsResponse getStatsForSymbol(String symbol) {
         CryptoStats stats = calculateStatsPerSymbol().stream()
                 .filter(s -> s.getSymbol().equalsIgnoreCase(symbol))

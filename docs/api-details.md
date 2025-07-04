@@ -41,15 +41,15 @@ Returns `400 Bad Request` with the error message as plain text in the response b
 
 ## Code Structure
 
-| Layer         | Classes                                                                 |
-|---------------|-------------------------------------------------------------------------|
-| **Model**     | `CryptoEntry`, `CryptoStats`                                            |
-| **Repository**| `CryptoEntryRepository`                                                 |
-| **Service**   | `CryptoEntryService`, `RecommendationService`                           |
-| **DTO**       | `CryptoStatsMapper`, `CryptoStatsResponse`, `NormalizedRangeResult`     |
-| **Controller**| `RecommendationController`                                              |
-| **Exception** | `GlobalExceptionHandler`                                                |
-| **Init**      | `CryptoDataInitializer`, `CryptoCSVLoader`, `CryptoProperties`          |
+| Layer                     | Classes                                                                 |
+|---------------------------|-------------------------------------------------------------------------|
+| **Model**                 | `CryptoEntry`, `CryptoStats`                                            |
+| **Repository**            | `CryptoEntryRepository`                                                 |
+| **Service**               | `CryptoEntryService`, `RecommendationService`                           |
+| **DTO**                   | `CryptoStatsMapper`, `CryptoStatsResponse`, `NormalizedRangeResult`     |
+| **Controller**            | `RecommendationController`                                              |
+| **Exception**             | `GlobalExceptionHandler`                                                |
+| **Service(Init Purpose)** | `CryptoDataInitializer`, `CryptoCSVLoader`, `CryptoProperties`          |
 
 ---
 

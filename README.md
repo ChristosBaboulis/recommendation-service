@@ -12,7 +12,6 @@ This is a Spring Boot application that provides statistics and investment recomm
 - **SLF4J & Logback** (logging framework)
 - **Lombok** (to reduce boilerplate code)
 - **JUnit 5** (unit and integration testing)
-- **MapStruct** (DTO mapping)
 - **GitHub Actions** (CI pipeline)
 - **Java Stream API** (for data processing and transformation)
 
