@@ -142,3 +142,10 @@ This convention ensures correct parsing and categorization of cryptocurrency ent
 ---
 
 For detailed project structure, see: [docs/api-details.md](docs/api-details.md)
+
+---
+
+Author
+----------
+Christos Bampoulis  
+GitHub: [@ChristosBaboulis](https://github.com/ChristosBaboulis)
