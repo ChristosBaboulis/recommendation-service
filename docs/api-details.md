@@ -56,7 +56,7 @@ Returns `400 Bad Request` with the error message as plain text in the response b
 |-----------------------------------|---------------------------------------------------------------------|
 | **Model**                         | `CryptoEntry`, `CryptoStats`                                        |
 | **Repository**                    | `CryptoEntryRepository`                                             |
-| **Service** (DML, Business Logic) | `CryptoEntryService`, `RecommendationService`                       |
+| **Service** (DAL, Business Logic) | `CryptoEntryService`, `RecommendationService`                       |
 | **DTO**                           | `CryptoStatsMapper`, `CryptoStatsResponse`, `NormalizedRangeResult` |
 | **Controller**                    | `RecommendationController`                                          |
 | **Exception**                     | `GlobalExceptionHandler`                                            |
