@@ -41,9 +41,10 @@ You can run the Recommendation Service either using Maven (locally) or as a Dock
 
 3. **H2 Console**  
    Access the in-memory database at: [http://localhost:8080/h2-console](http://localhost:8080/h2-console)
-    - JDBC URL: `jdbc:h2:mem:testdb`
+    - JDBC URL: `jdbc:h2:mem:cryptodb`
     - Username: `sa`
-    - Password: *(leave empty)*
+    - Password: *(leave empty)*  
+   Note: Deactivate or extend requests on Custom Rate Limiting Filter if you want to access db.
 
 
 4. **Testing with Postman**  
@@ -76,7 +77,8 @@ You can run the Recommendation Service either using Maven (locally) or as a Dock
     Access the in-memory database at: [http://localhost:8080/h2-console](http://localhost:8080/h2-console)
     - JDBC URL: `jdbc:h2:mem:cryptodb`
     - Username: `sa`
-    - Password: *(leave empty)*
+    - Password: *(leave empty)*  
+      Note: Deactivate or extend requests on Custom Rate Limiting Filter if you want to access db.
 
 
 4. **Testing with Postman**  

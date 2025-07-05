@@ -23,30 +23,6 @@ public class RecommendationService {
     private final CryptoEntryService entryService;
     private final CryptoStatsMapper statsMapper;
 
-    public List<CryptoStats> calculateStatsPerSymbol() {
-        List<String> supportedSymbols = entryService.getAllSymbols();
-
-        List<CryptoStats> statsList = new ArrayList<>();
-
-        for (String symbol : supportedSymbols) {
-            try (Stream<CryptoEntry> stream = entryService.streamEntriesBySymbol(symbol)) {
-                List<CryptoEntry> entries = stream.sorted(Comparator.comparing(CryptoEntry::getTimestamp))
-                        .toList();
-
-                if (entries.isEmpty()) continue;
-
-                BigDecimal oldest = entries.getFirst().getPrice();
-                BigDecimal newest = entries.getLast().getPrice();
-                BigDecimal min = entries.stream().map(CryptoEntry::getPrice).min(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
-                BigDecimal max = entries.stream().map(CryptoEntry::getPrice).max(Comparator.naturalOrder()).orElse(BigDecimal.ZERO);
-
-                statsList.add(new CryptoStats(symbol, oldest, newest, min, max));
-            }
-        }
-
-        return statsList;
-    }
-
     @Transactional(readOnly = true)
     public List<NormalizedRangeResult> getAllByNormalizedRangeDesc() {
         List<CryptoStats> statsList = calculateStatsPerSymbol();
@@ -85,6 +61,39 @@ public class RecommendationService {
                 })
                 .max(Comparator.comparing(NormalizedRangeResult::getNormalizedRange))
                 .orElseThrow(() -> new IllegalArgumentException("No crypto data found for date: " + date));
+    }
+
+    //HELPERS
+    private List<CryptoStats> calculateStatsPerSymbol() {
+        List<String> supportedSymbols = entryService.getAllSymbols();
+        List<CryptoStats> statsList = new ArrayList<>();
+
+        for (String symbol : supportedSymbols) {
+            try (Stream<CryptoEntry> stream = entryService.streamEntriesBySymbol(symbol)) {
+                Iterator<CryptoEntry> iterator = stream.iterator();
+                if (!iterator.hasNext()) continue;
+
+                CryptoEntry first = iterator.next();
+                BigDecimal min = first.getPrice();
+                BigDecimal max = first.getPrice();
+                BigDecimal oldest = first.getPrice();   //Stream is returned sorted from repo -> 1st element is oldest
+                BigDecimal newest = first.getPrice();
+
+                while (iterator.hasNext()) {
+                    CryptoEntry entry = iterator.next();
+                    BigDecimal price = entry.getPrice();
+
+                    // Update min/max
+                    if (price.compareTo(min) < 0) min = price;
+                    if (price.compareTo(max) > 0) max = price;
+
+                    newest = price;
+                }
+
+                statsList.add(new CryptoStats(symbol, oldest, newest, min, max));
+            }
+        }
+        return statsList;
     }
 
     private BigDecimal calculateNormalizedRange(CryptoStats stats) {

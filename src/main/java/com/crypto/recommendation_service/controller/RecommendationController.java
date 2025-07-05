@@ -17,7 +17,6 @@ import java.util.List;
 public class RecommendationController {
     private final RecommendationService recommendationService;
 
-
     /*
      * GET /cryptos/normalized
      * Returns a descending sorted list of cryptos by normalized range

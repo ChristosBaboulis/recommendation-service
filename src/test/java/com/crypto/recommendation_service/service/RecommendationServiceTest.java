@@ -39,31 +39,6 @@ class RecommendationServiceTest {
     }
 
     @Test
-    void calculateStatsPerSymbol_shouldReturnCorrectStats() {
-        LocalDateTime now = LocalDateTime.now();
-        CryptoEntry e1 = new CryptoEntry(1L, now.minusDays(2), "BTC", new BigDecimal("50"));
-        CryptoEntry e2 = new CryptoEntry(2L, now, "BTC", new BigDecimal("150"));
-
-        when(entryService.streamEntriesBySymbol("BTC")).thenReturn(Stream.of(e1, e2));
-        when(entryService.streamEntriesBySymbol("ETH")).thenReturn(Stream.empty());
-        when(entryService.streamEntriesBySymbol("LTC")).thenReturn(Stream.empty());
-        when(entryService.streamEntriesBySymbol("DOGE")).thenReturn(Stream.empty());
-        when(entryService.streamEntriesBySymbol("XRP")).thenReturn(Stream.empty());
-        when(entryService.getAllSymbols()).thenReturn(List.of("BTC"));
-
-
-        List<CryptoStats> result = service.calculateStatsPerSymbol();
-
-        assertThat(result).hasSize(1);
-        CryptoStats stats = result.getFirst();
-        assertThat(stats.getSymbol()).isEqualTo("BTC");
-        assertThat(stats.getMinPrice()).isEqualByComparingTo("50");
-        assertThat(stats.getMaxPrice()).isEqualByComparingTo("150");
-        assertThat(stats.getOldestPrice()).isEqualByComparingTo("50");
-        assertThat(stats.getNewestPrice()).isEqualByComparingTo("150");
-    }
-
-    @Test
     void getAllByNormalizedRangeDesc_shouldReturnSortedResults() {
         CryptoEntry b1 = new CryptoEntry(1L, LocalDateTime.now(), "BTC", new BigDecimal("50"));
         CryptoEntry b2 = new CryptoEntry(2L, LocalDateTime.now(), "BTC", new BigDecimal("200"));
