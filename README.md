@@ -145,6 +145,13 @@ For detailed project structure, see: [docs/api-details.md](docs/api-details.md)
 
 ---
 
+## License
+
+
+This project is licensed under the MIT License.
+
+---
+
 Author
 ----------
 Christos Bampoulis  

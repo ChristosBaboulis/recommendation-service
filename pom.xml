@@ -14,9 +14,16 @@
     <name>Recommendation-Service</name>
     <description>Recommendation-Service</description>
     <url/>
+
+    <!-- === License metadata (MIT) for public distribution === -->
     <licenses>
-        <license/>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
     </licenses>
+
     <developers>
         <developer/>
     </developers>
